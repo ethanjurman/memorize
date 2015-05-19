@@ -40,14 +40,10 @@ var startGame = function(type){
 var startRound = function(index){
   var time = Math.min(300 - (round - 3) * 3, 200);
   setTimeout(function(){
-    var ele = getTableElement(seed[index]);
-    ele.style.background = 'lightblue';
-    ele.style.fontSize = '120px';
+    virtualHit(seed[index]);
     playAudio(seed[index], time);
     setTimeout(function(){
-      var ele = getTableElement(seed[index]);
-      ele.style.background = '';
-      ele.style.fontSize = '';
+      virtualHitRemove(seed[index]);
       if (index < round-1){
         startRound(++index);
       } else {
