@@ -10,7 +10,7 @@ table, td {
 td {
   background: white;
   text-align: center;
-  font-size: 128px;
+  font-size: 80px;
   cursor: pointer;
   -webkit-transition: font-size 0.1s, background 0.1s; /* webkit */
   transition: font-size 0.1s, background 0.1s;
@@ -26,14 +26,14 @@ td {
 
 td:active {
   background: lightblue;
-  font-size: 150px;
+  font-size: 120px;
 }
 
 table {
   width: 100%;
   max-width: 700px;
   height: calc(100% - 7em);
-  max-height: 700px;
+  max-height: calc(100% - 7em);
   background: black;
 }
 

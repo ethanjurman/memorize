@@ -17,8 +17,9 @@ var gametimer = setInterval(function(){
     }
   }
   if (gameover){
-    document.getElementById('audioOver').play();
+    (new Audio('sound/DtmfStar.ogg')).play();
     window.clearInterval(gametimer);
+    document.querySelectorAll('.score')[gameType - 1].style.color = 'red';
   }
 },100);
 
@@ -26,29 +27,29 @@ var gametimer = setInterval(function(){
 var startGame = function(type){
   gameType = type;
   document.getElementById('select-mode').style.display = 'none';
-  var tableElement = document.getElementById('game-mode-'+type);
+  var tableElement = document.getElementById('game-mode-'+gameType);
   tableElement.style.display = '';
 
   while (seed.length < 100){
-    seed = seed + ((Math.random() * (type == 1 ? 3 : 8) + 1).toFixed());
+    seed = seed + ((Math.random() * (gameType == 1 ? 3 : 8) + 1).toFixed());
   }
-  console.log(seed)
-  startRound(type, 0)
+  startRound(0)
 }
 
-var startRound = function(type, index){
-  var time = 300;
+// starting the round
+var startRound = function(index){
+  var time = Math.min(300 - (round - 3) * 3, 200);
   setTimeout(function(){
-    var ele = getTableElement(type, seed[index]);
+    var ele = getTableElement(seed[index]);
     ele.style.background = 'lightblue';
-    ele.style.fontSize = '150px';
-    playAudio(seed[index]);
+    ele.style.fontSize = '120px';
+    playAudio(seed[index], time);
     setTimeout(function(){
-      var ele = getTableElement(type, seed[index]);
+      var ele = getTableElement(seed[index]);
       ele.style.background = '';
       ele.style.fontSize = '';
       if (index < round-1){
-        startRound(type, ++index);
+        startRound(++index);
       } else {
         listen = true;
       }
@@ -56,41 +57,82 @@ var startRound = function(type, index){
   }, time);
 }
 
-var getTableElement = function(type,number){
-  return document.querySelectorAll('td[data-value="' + number + '"]')[number > 4 ? 0 : type-1];
+// getting a value on the board
+var getTableElement = function(number){
+  return document.querySelectorAll('td[data-value="' + number + '"]')[number > 4 ? 0 : gameType-1];
 }
 
-var clickValue = function(e, type){
-  var target = e.target || event.srcElement;
+// what happens when I click
+var clickValue = function(value){
   if (listen) {
     timer = Math.min(100,timer + 5);
-    playAudio(target.getAttribute('data-value'));
-    if (seed[++values] != target.getAttribute('data-value')){
+    playAudio(value);
+    if (seed[++values] != value){
       timer = -10;
-    }
-    console.log(values == round)
-    if (values == round-1){
+    } else if (values == round-1){
       round++;
       values = -1;
       listen = false;
       score = score + timer;
       document.querySelectorAll('.score')[gameType - 1].innerHTML = round - 3 + " : " + score;
       setTimeout(function(){
-        startRound(type, 0);
+        startRound(0);
       },500);
     }
   }
 }
 
-var playAudio = function(value){
-  var audio = document.getElementById('audio' + value);
-  audio.play();
-  stopAudio(audio);
+var fullAudio = null;
+
+// gotta have sound!
+var playAudio = function(value, time){
+  var time = time == undefined ? 250 : time;
+  if (fullAudio == null){
+    fullAudio = document.getElementById('audio');
+  }
+  fullAudio.pause();
+  // var audio = document.getElementById('audio' + value);
+  fullAudio.currentTime = (Number(value)-1);
+  fullAudio.play();
+  stopAudio(time);
 }
 
-var stopAudio = function(audio){
+// time to stop the audio
+var stopAudio = function(time){
   setTimeout(function(){
-    audio.pause();
-    audio.currentTime = 0;
-  }, 300);
+    fullAudio.pause();
+  }, time);
+}
+
+var keys = [
+  false, false, false, false, false,
+  false, false, false, false, false
+];
+
+var keydown = function(e){
+  if (!keys[e.which - 96]){
+    if (e.which >= 97 && e.which <= 105){
+      virtualHit(e.which - 96);
+      clickValue(e.which - 96);
+      keys[e.which - 96] = true;
+    }
+  }
+}
+
+var keyup = function(e){
+  if (e.which >= 97 && e.which <= 105){
+    virtualHitRemove(e.which - 96);
+    keys[e.which - 96] = false;
+  }
+}
+
+var virtualHit = function(value){
+  console.log(value)
+  getTableElement(value).style.background = 'lightblue';
+  getTableElement(value).style.fontSize = '120px';
+}
+
+var virtualHitRemove = function(value){
+  getTableElement(value).style.background = '';
+  getTableElement(value).style.fontSize = '';
 }
