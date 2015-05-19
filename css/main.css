@@ -17,9 +17,8 @@ td {
   text-align: center;
   font-size: 80px;
   cursor: pointer;
-  -webkit-transition: font-size 0.1s, background 0.1s, translate3d(0,0,0); /* webkit */
-  transition: font-size 0.1s, background 0.1s, translate3d(0,0,0);
-  /* translate3d causes iOS to use hardware-acceleration */
+  -webkit-transition: font-size 0.1s, background 0.1s; /* webkit */
+  transition: font-size 0.1s, background 0.1s;
 
   /* prevent highlight */
   -webkit-touch-callout: none;
